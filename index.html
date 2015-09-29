@@ -1,0 +1,202 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-jp">
+<title>RubyCocoaでスクリーンセーバを作る</title>
+<style type="text/css">
+<!--
+h1 {
+	margin-right: 0%;
+	margin-left: 0%;
+	text-align: center;
+	padding: 0.5em 0.5em;
+	color: #ffffff;
+	text-indent: 0.25em;
+	border-style: none;
+	background-color: #043040;
+}
+h2 {
+	margin-right: 0%;
+	margin-left: 0%;
+	text-align: left;
+	padding: 0.3em 0.3em;
+	color: #ffffff;
+	text-indent: 0.25em;
+	border-style: none;
+	background-color: #409030;
+}
+pre {
+	font-family: monospace;
+	border-style: solid;
+	border-width: 1px 2px 2px 1px;
+	border-color: #6666aa; 
+	color: #444466;
+	background-color: #e8e8ff;
+	white-space: pre;
+	margin-right: 4.0em;
+	margin-left: 3.5em;
+	padding: 0.5em 2em;
+}
+a {
+	text-decoration: none
+}
+body {
+	background-color:#ffffdd;
+}
+-->
+</style>
+</head>
+<body>
+<h1>RubyCocoaでスクリーンセーバを作る</h1>
+
+RubyCocoaでスクリーンセーバを作る手順を解説する。
+
+<h2>MacOSのスクリーンセーバ</h2>
+
+MacOSでは以下の手順でスクリーンセーバを作ることができる。
+
+<ul>
+<li>
+<a href="http://developer.apple.com/documentation/UserExperience/Reference/ScreenSaver/Classes/ScreenSaverView_Class/Reference/Reference.html">ScreenSaverView</a>クラスを
+実装して.saverという拡張子を持つbundleを作る。
+<li>
+定期的に呼ばれる
+<a href="http://developer.apple.com/documentation/UserExperience/Reference/ScreenSaver/Classes/ScreenSaverView_Class/Reference/Reference.html#//apple_ref/occ/instm/ScreenSaverView/animateOneFrame">animateOneFrame</a>
+メソッドを実装する。
+<li>このバンドルを/System/Library/Screen Saver/に置く。
+</ul>
+
+XCodeにスクリーンセーバのテンプレートは用意されていないが、
+「Cocoa Bundle」のプロジェクトを作成し/
+ScreenSaverViewのサブクラスのObjective-Cプログラムを追加し/
+拡張子をsaverに変更すれば
+スクリーンセーバ用のbundleを<a href="http://gyazo.com/4873e9662046c77ff4e8040ba96afbc3.png">ビルド</a>することができる。
+
+<h2>RubyCocoaでの実装</h2>
+
+ScreenSaverViewのサブクラスを直接Rubyで書くことは(多分)できないので、
+Objective-Cで作ったクラスからRubyプログラムを呼べばよい。
+
+<p>
+まず以下のような<code>WikipediaSaverLoader.m</code>を作る。
+<code>RBBundleInit</code>が
+RubyCocoaを初期化しRubyプログラムをロードする関数で、
+Leopardの<code>/Developer/Examples/RubyCocoa/RubyAnywhere/</code>などに使用例がある。
+
+<pre>
+#import &lt;Cocoa/Cocoa.h>
+#import &lt;RubyCocoa/RBRuntime.h>
+#import &lt;ScreenSaver/ScreenSaver.h>
+#import &lt;WebKit/WebKit.h>
+
+@interface WikipediaSaverLoader : ScreenSaverView
+{
+  id wikipediaSaver;
+}
+@end
+
+@implementation WikipediaSaverLoader
+- (id)initWithFrame:(NSRect)frameRect isPreview:(BOOL)preview
+{
+  [super initWithFrame:frameRect isPreview:preview];
+  
+  static int installed = 0;
+  if (! installed) {
+    if (RBBundleInit("WikipediaSaver.rb", [self class], nil))
+      NSLog(@"WikipediaSaverLoader.install: failed");
+    else {
+      NSLog(@"WikipediaSaverLoader.install: success");
+      installed = 1;
+    }
+
+    Class rubyClass = NSClassFromString(@"WikipediaSaver");
+    NSAssert(nil != rubyClass, @"could not find Ruby class");
+
+    wikipediaSaver = [[rubyClass alloc] initWithFrame:frameRect isPreview:preview];
+    NSAssert(nil != wikipediaSaver, @"Ruby instance should not be nil");
+
+    [wikipediaSaver setSaver:self];
+  }
+
+  return self;
+}
+
+- (NSTimeInterval) animationTimeInterval {
+  return [wikipediaSaver animationTimeInterval];
+}
+
+- (void)animateOneFrame
+{
+  [wikipediaSaver animateOneFrame];
+}
+
+@end
+</pre>
+
+これをスクリーンセーバとして登録すると
+<code>animateOneFrame</code>が定期的にシステムから呼ばれるので、
+そこからRubyCocoaプログラムを呼ぶようにすればよい。
+
+<p>
+スクリーンセーバ本体の<code>WikipediaSaver.rb</code>は以下のようにRubyで記述することができる。
+ここでは15秒おきにWikipediaのランダムページを表示するようにしている。
+
+<pre>
+require 'osx/cocoa'
+include OSX
+
+require_framework 'ScreenSaver'
+require_framework 'Webkit'
+
+class WikipediaSaver < ScreenSaverView
+  def initWithFrame_isPreview(frameRect,p)
+    super_initWithFrame_isPreview(frameRect,p)
+  end
+
+  def animateOneFrame
+    @webView.mainFrame.loadRequest(@request)
+  end
+
+  def animationTimeInterval
+    15
+  end
+
+  def setSaver(saver)
+    @saver = saver
+    setup
+  end
+
+  def setup
+    url = "http://ja.wikipedia.org/wiki/%E7%89%B9%E5%88%A5:Random"
+    @nsurl = NSURL.URLWithString(url)
+
+    screenRect = NSScreen.mainScreen.frame
+    @webView = WebView.alloc.initWithFrame(screenRect)
+    @saver.addSubview(@webView)
+
+    @request = NSURLRequest.requestWithURL(@nsurl)
+    @webView.mainFrame.loadRequest(@request)
+  end
+end
+</pre>
+
+<h2>ダウンロード</h2>
+
+このドキュメントとソース、スクリーンセーバ本体を
+<a href="WikipediaSaver.dmg">WikipediaSaver.dmg</a>にまとめてある。
+
+ソースは<a href="http://pastie.caboo.se/140934">Pastie</a>にも貼っておいた。
+(
+<a href="http://pastie.caboo.se/140934">ObjC</a>,
+<a href="http://pastie.caboo.se/140935">Ruby</a>
+)
+
+Enjoy!
+
+<p>
+<hr>
+<p>
+2008/1/18 Toshiyuki Masui @ Pitecan.com
+
+</body>
+</html>
+

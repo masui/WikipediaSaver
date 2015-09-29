@@ -1,0 +1,106 @@
+// !$*UTF8*$!
+{
+	089C1669FE841209C02AAC07 /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Release;
+		activeTarget = 8D5B49AC048680CD000E48DA /* WikipediaSaver */;
+		addToTargets = (
+			8D5B49AC048680CD000E48DA /* WikipediaSaver */,
+		);
+		codeSenseManager = CE6C31F90D41CBC800236FA2 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					243,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					150,
+					60,
+					20,
+					48.16259765625,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 222416192;
+			PBXWorkspaceStateSaveDate = 222416192;
+		};
+		perUserProjectItems = {
+			CEB6F9D10D4268C600A2BA9A /* PBXTextBookmark */ = CEB6F9D10D4268C600A2BA9A /* PBXTextBookmark */;
+			CEB6F9D20D4268C600A2BA9A /* PBXTextBookmark */ = CEB6F9D20D4268C600A2BA9A /* PBXTextBookmark */;
+		};
+		sourceControlManager = CE6C31F80D41CBC800236FA2 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	8D5B49AC048680CD000E48DA /* WikipediaSaver */ = {
+		activeExec = 0;
+	};
+	CE6C31F80D41CBC800236FA2 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	CE6C31F90D41CBC800236FA2 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	CEB6F9C30D41CDBB00A2BA9A /* WikipediaSaverLoader.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {506, 796}}";
+			sepNavSelRange = "{1265, 0}";
+			sepNavVisRange = "{882, 337}";
+		};
+	};
+	CEB6F9D10D4268C600A2BA9A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		comments = "error: incompatible types in return";
+		fRef = CEB6F9C30D41CDBB00A2BA9A /* WikipediaSaverLoader.m */;
+		rLen = 1;
+		rLoc = 45;
+		rType = 1;
+	};
+	CEB6F9D20D4268C600A2BA9A /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = CEB6F9C30D41CDBB00A2BA9A /* WikipediaSaverLoader.m */;
+		name = "WikipediaSaverLoader.m: 55";
+		rLen = 0;
+		rLoc = 1265;
+		rType = 0;
+		vrLen = 217;
+		vrLoc = 882;
+	};
+}
